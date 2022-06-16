@@ -3,8 +3,8 @@
 A simple **remote control** for your PC keyboard.
 
 > Currently, a proof of concept:
-> - `POST /p/<key>` Presses key on host machine
-> - `POST /r/<key>` Releases key on host machine
+> - `GET /p/<key>` Presses key on host machine
+> - `GET /r/<key>` Releases key on host machine
 > - Tested only on Windows
 > - Run with `uvicorn main:app --host 0.0.0.0 --port 8000`
 
