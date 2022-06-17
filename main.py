@@ -1,12 +1,20 @@
-from typing import Union
-
-from fastapi import FastAPI
-from pydantic import BaseModel
-from pynput.keyboard import Key, Controller
-
+import asyncio
 import logging
 
+from fastapi import FastAPI, Request
+from pydantic import BaseModel
+from pynput.keyboard import Key, Controller
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
+
+import config
+
+log = logging.getLogger()
+
+
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates/")
 
 
 class PilotBackend:
@@ -25,9 +33,6 @@ class PilotBackend:
     def release_key(self, key: str):
         self.keyboard.release(key)
 
-# class Key(BaseModel):
-#     """Add validation with config???"""
-#     key: str
 
 class UnknownKeyError(Exception):
     pass
@@ -39,44 +44,49 @@ class Server:
     # def method(self, request: InModel) -> OutModel:
     #     return OutModel()
 
-    # def __init_subclass__(cls, **kwargs):
-    #     wow
-        # pass
-
-    def __init__(self, config):
-        self._config = config
+    def __init__(self, _config):
+        self._config = _config
         self._backend = PilotBackend()
 
-    def press(self, key):
+    async def press_once(self, key):
         self._validate_key(key)
-        key = self._config.BUTTON_LIST[key]
+        key = self._config.BUTTONS[key].key
         self._backend.press_key(key)
-        logging.info(f'Pressed {key}')
-
-    def release(self, key):
-        self._validate_key(key)
-        key = self._config.BUTTON_LIST[key]
+        await asyncio.sleep(0.1)
         self._backend.release_key(key)
-        logging.info(f'Released {key}')
+        log.info(f'Pressed once: {key}')
 
     def _validate_key(self, key):
-        if key not in self._config.BUTTON_LIST.keys():
+        if key not in self._config.BUTTONS.keys():
             raise UnknownKeyError(key)
 
-        return self._config.BUTTON_LIST[key]
+        return self._config.BUTTONS[key]
+
+    def get_buttons(self):
+        return [
+            {'label': btn.label, 'value': val}
+            for val, btn in self._config.BUTTONS.items()
+        ]
 
 
-import config
 server = Server(config)
 
-
-@app.get("/p/{k}")
-def press_key(k: str):
-    server.press(k)
-    return {"p": k}
+class KeyPress(BaseModel):
+    key: str
 
 
-@app.get("/r/{k}")
-def release_key(k: str):
-    server.release(k)
-    return {"r": k}
+@app.post('/p/{key}')
+async def press_key(key: str):
+    await server.press_once(key)
+    return {"p": key}
+
+
+
+@app.get('/')
+async def index(request: Request):
+    ctx = {
+        'request': request,
+        'buttons': server.get_buttons(),
+    }
+    return templates.TemplateResponse('index.html', context=ctx)
+
