@@ -1,10 +1,13 @@
 import asyncio
 import logging
 
+from fastapi import FastAPI, Request
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-
 from pynput.keyboard import Key, Controller
 
+from remote import config
 
 __version__ = '0.1.0'
 
@@ -25,9 +28,12 @@ class PilotBackend:
     def press_key(self, key: str):
         """Simulates keypress"""
         self.keyboard.press(key)
-
+        
     def release_key(self, key: str):
         self.keyboard.release(key)
+
+    def tap(self, key: str):
+        self.keyboard.tap(key)
 
 
 class UnknownKeyError(Exception):
@@ -51,9 +57,7 @@ class Server:
     async def press_once(self, key):
         self._validate_key(key)
         key = self._config.BUTTONS[key].key
-        self._backend.press_key(key)
-        await asyncio.sleep(0.1)
-        self._backend.release_key(key)
+        self._backend.tap(key)
         log.info(f'Pressed once: {key}')
 
     def _validate_key(self, key):
@@ -64,6 +68,34 @@ class Server:
 
     def get_buttons(self):
         return [
-            {'label': btn.label, 'value': val}
-            for val, btn in self._config.BUTTONS.items()
+            {'label': btn.label, 'value': btn.key}
+            for btn in self._config.BUTTONS
         ]
+
+
+app = FastAPI()
+# Mount static files from remote/statics
+app.mount("/static", StaticFiles(packages=["remote"]), name="static")
+
+import pathlib
+
+base_dir = pathlib.Path(__file__).parent
+template_path = base_dir / "templates"
+templates = Jinja2Templates(directory=template_path)  # pewnie też zjebane
+
+server = Server(config)
+
+
+@app.post('/p/{key}')
+async def press_key(key: str):
+    await server.press_once(key)
+    return {"p": key}
+
+
+@app.get('/')
+async def index(request: Request):
+    ctx = {
+        'request': request,
+        'buttons': server.get_buttons(),
+    }
+    return templates.TemplateResponse('index.html', context=ctx)

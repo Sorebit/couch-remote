@@ -3,6 +3,7 @@
 A utility, available at [pypi](#). Download it on a computer and serve yourself a remote keyboard to control it.
 
 ## Usage
+
 1. **To install:** `pip install couch-remote` (in a venv or globally with `-g`)
 2. Now, your `remote` is available.
 3. **Optionally,** `remote scaffold-config`, creates a basic settings file, then `remote global settings.py` copies it to a [global configuration directory](#install-a-global-settings-file-pilot-global-settingspy).
@@ -24,12 +25,9 @@ BUTTON_LIST = {
 
 Q: Do jakiego formatu zapisują się i wczytują configi w settingsach?
 
-How do you host an async app?1
 
 ### Install a global settings file `remote global settings.py `
 
 When ran, stores settings at a default path: `~/.config/pilot/settings.py`
 
 Pilot will default to this path when not specified.
-
-Wchodzisz sobie na telefonie na tym samym wifi i pokazują ci się przyciski. Jak klikniesz ten przycisk, to po ws się wysyła nazwa przycisku, a serwer klika systemowo spację.
