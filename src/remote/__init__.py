@@ -1,20 +1,16 @@
 import asyncio
 import logging
 
-from fastapi import FastAPI, Request
 from pydantic import BaseModel
-from pynput.keyboard import Key, Controller
-from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
 
-import config
+from pynput.keyboard import Key, Controller
+
+
+__version__ = '0.1.0'
+
+global_config_path = "~/.config/pilot"
 
 log = logging.getLogger()
-
-
-app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates/")
 
 
 class PilotBackend:
@@ -36,6 +32,10 @@ class PilotBackend:
 
 class UnknownKeyError(Exception):
     pass
+
+
+class KeyPress(BaseModel):
+    key: str
 
 
 class Server:
@@ -67,26 +67,3 @@ class Server:
             {'label': btn.label, 'value': val}
             for val, btn in self._config.BUTTONS.items()
         ]
-
-
-server = Server(config)
-
-class KeyPress(BaseModel):
-    key: str
-
-
-@app.post('/p/{key}')
-async def press_key(key: str):
-    await server.press_once(key)
-    return {"p": key}
-
-
-
-@app.get('/')
-async def index(request: Request):
-    ctx = {
-        'request': request,
-        'buttons': server.get_buttons(),
-    }
-    return templates.TemplateResponse('index.html', context=ctx)
-

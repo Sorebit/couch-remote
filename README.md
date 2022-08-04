@@ -1,27 +1,16 @@
-# Pilot
+# Couch Remote
 
-A simple **remote control** for your PC keyboard.
-
-> Currently, a proof of concept:
-> - `GET /p/<key>` Presses key on host machine
-> - `GET /r/<key>` Releases key on host machine
-> - Tested only on Windows
-> - Run with `uvicorn main:app --host 0.0.0.0 --port 8000`
-
----
-
-- Easy install using `pip`.
-- Specify the keys, you would like to be able to press in `config.py` using pynput.
-- Serve the remote locally and use it on your phone or whatever. 
+A utility, available at [pypi](#). Download it on a computer and serve yourself a remote keyboard to control it.
 
 ## Usage
-In a venv do:
-- `pip install pilot` - to install
-- `pilot config` - to create a sample configuration file
-- `pilot serve --local` - to serve over local network
-- Access at url provided that gets printed out 
+1. **To install:** `pip install couch-remote` (in a venv or globally with `-g`)
+2. Now, your `remote` is available.
+3. **Optionally,** `remote scaffold-config`, creates a basic settings file, then `remote global settings.py` copies it to a [global configuration directory](#install-a-global-settings-file-pilot-global-settingspy).
+4.  **Finally,** `remote control` serves an instance at [localhost:4444](http://localhost:4444). This is the **only** command, you're going to need from now on.
 
-## Config
+## Settings
+
+And how to set them.
 
 ```python
 from pynput.keyboard import Key
@@ -32,3 +21,15 @@ BUTTON_LIST = {
     'sp': Key.space,
 }
 ```
+
+Q: Do jakiego formatu zapisują się i wczytują configi w settingsach?
+
+How do you host an async app?1
+
+### Install a global settings file `remote global settings.py `
+
+When ran, stores settings at a default path: `~/.config/pilot/settings.py`
+
+Pilot will default to this path when not specified.
+
+Wchodzisz sobie na telefonie na tym samym wifi i pokazują ci się przyciski. Jak klikniesz ten przycisk, to po ws się wysyła nazwa przycisku, a serwer klika systemowo spację.
