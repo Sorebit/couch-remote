@@ -1,7 +1,8 @@
-import asyncio
 import logging
+import pathlib
+from typing import Dict, List
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -11,37 +12,37 @@ from remote import config
 
 __version__ = '0.1.0'
 
-global_config_path = "~/.config/pilot"
+# global_config_path = '~/.config/pilot'
 
-log = logging.getLogger()
+log = logging.getLogger(__name__)
 
 
-class PilotBackend:
-    """this is an abstract class, connected to the PC, so OS-dependent probably. just to be sure someone can add their
-    backend easily."""
+class RemoteBackend:
+    """
+    TODO: Enable adding other backends easily.
 
+    Since I'm aiming at a single config which is independent of the backend, I will probably
+    need to map the keys onto something independent like strings instead of the current way of just
+    listing pynput.keyboard.Button instances
+    """
+
+    def tap(self, key) -> None:
+        """Implement this."""
+        raise NotImplementedError("This is an abstract backend")
+
+
+class PynputBackend(RemoteBackend):
     def __init__(self):
         self.keyboard = Controller()
         # handle special keys easily
         # such as  media_play_pause
 
-    def press_key(self, key: str):
-        """Simulates keypress"""
-        self.keyboard.press(key)
-        
-    def release_key(self, key: str):
-        self.keyboard.release(key)
-
-    def tap(self, key: str):
+    def tap(self, key: str) -> None:
         self.keyboard.tap(key)
 
 
 class UnknownKeyError(Exception):
     pass
-
-
-class KeyPress(BaseModel):
-    key: str
 
 
 class Server:
@@ -52,50 +53,61 @@ class Server:
 
     def __init__(self, _config):
         self._config = _config
-        self._backend = PilotBackend()
+        self._backend = PynputBackend()
 
-    async def press_once(self, key):
-        self._validate_key(key)
-        key = self._config.BUTTONS[key].key
+    async def tap(self, key_sym: str) -> None:
+        key = await self._find_key(key_sym)
         self._backend.tap(key)
         log.info(f'Pressed once: {key}')
+        print(f'Pressed once: {key}')
 
-    def _validate_key(self, key):
-        if key not in self._config.BUTTONS.keys():
-            raise UnknownKeyError(key)
+    # TODO: test it?
+    async def _find_key(self, key_sym: str) -> Key:
+        # Validate
+        if key_sym not in self._config.buttons:
+            raise UnknownKeyError(key_sym)
 
-        return self._config.BUTTONS[key]
+        return self._config.buttons[key_sym].key
 
-    def get_buttons(self):
+    async def get_buttons(self):
         return [
-            {'label': btn.label, 'value': btn.key}
-            for btn in self._config.BUTTONS
+            {'label': btn.label, 'value': val}
+            for val, btn in self._config.buttons.items()
         ]
 
 
+# TODO: how to pack this up so that it can be instantiated in __main__?
 app = FastAPI()
 # Mount static files from remote/statics
-app.mount("/static", StaticFiles(packages=["remote"]), name="static")
-
-import pathlib
-
+app.mount('/static', StaticFiles(packages=['remote']), name='static')
+# Add templates from remote/templates
 base_dir = pathlib.Path(__file__).parent
-template_path = base_dir / "templates"
-templates = Jinja2Templates(directory=template_path)  # pewnie też zjebane
+template_path = base_dir / 'templates'
+templates = Jinja2Templates(directory=template_path)
 
 server = Server(config)
 
 
-@app.post('/p/{key}')
-async def press_key(key: str):
-    await server.press_once(key)
-    return {"p": key}
+class KeyPress(BaseModel):
+    key: str
+
+
+@app.post('/', response_model=KeyPress)
+async def tap(kp: KeyPress):
+    """On a successful attempt, returns pressed key."""
+    try:
+        await server.tap(kp.key)
+    except UnknownKeyError:
+        raise HTTPException(status_code=404, detail='Unknown key')
+
+    return kp
 
 
 @app.get('/')
 async def index(request: Request):
+    """Index page with buttons corresponding to keys."""
     ctx = {
         'request': request,
-        'buttons': server.get_buttons(),
+        'buttons': await server.get_buttons(),
     }
     return templates.TemplateResponse('index.html', context=ctx)

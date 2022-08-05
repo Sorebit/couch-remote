@@ -1,5 +1,7 @@
 import uvicorn
 
+from remote import config
+
 
 def main():
-    uvicorn.run('remote:app', port=4444, log_level='info', reload=True)
+    uvicorn.run('remote:app', port=config.port, log_level='info', reload=True)
