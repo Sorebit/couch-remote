@@ -5,9 +5,10 @@
     <meta charset="UTF-8">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
 
-    <title>Pilot</title>
+
+    <title>Couch Remote</title>
 </head>
 <body>
 <div class="keys">
@@ -15,6 +16,6 @@
         <button class="key" value="{{ btn.value }}">{{ btn.label }}</button>
     {% endfor %}
 </div>
-<script src="/static/buttons.js"></script>
+<script src="{{ url_for('static', path='/buttons.js') }}"></script>
 </body>
 </html>
