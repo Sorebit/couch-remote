@@ -1,13 +1,18 @@
-"""TODO: Link to pynput Key documentation"""
+"""TODO:
+   - Link to pynput Key documentation
+   - Transform into pydantic Settings object
+"""
 
 from pynput.keyboard import Key
 
-from models import Button
+from remote.models import Button
 
 
-BUTTONS = {
+buttons = {
     'play_pause_media': Button(key=Key.media_play_pause, label='⏯️'),
     'esc': Button(key=Key.esc, label='Esc'),
     'caps': Button(key=Key.caps_lock, label='Caps Lock'),
-    'sp': Button(key=Key.space, label='Space'),
+    'space': Button(key=Key.space, label='Space'),
 }
+
+port = 4444
