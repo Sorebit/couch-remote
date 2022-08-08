@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "couch-remote"
-version = "0.1.0"
+version = "0.2.0"
 description = "A simple remote web keyboard"
 readme = "README.md"
 authors = [{ name = "Sorebit", email = "tomulewicz.s@pm.me" }]
@@ -51,5 +51,8 @@ tag = true
 push = false
 
 [tool.bumpver.file_patterns]
-"pyproject.toml" = ['current_version = "{version}"']
+"pyproject.toml" = [
+    'current_version = "{version}"',
+    'version = "{version}"',
+]
 "src/remote/__init__.py" = ["{version}"]

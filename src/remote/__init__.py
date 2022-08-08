@@ -87,9 +87,6 @@ templates = Jinja2Templates(directory=template_path)
 server = Server(config)
 
 
-
-
-
 @app.post('/', response_model=KeyPress)
 async def tap(kp: KeyPress):
     """On a successful attempt, responds with pressed key."""
