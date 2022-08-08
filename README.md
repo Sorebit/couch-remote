@@ -1,6 +1,6 @@
 # Couch Remote
 
-A utility, available at [pypi](#). Download it on a computer and serve yourself a remote keyboard to control it.
+A utility, available at [PyPI](https://pypi.org/project/couch-remote/). Download it on a computer and serve yourself a remote keyboard to control it.
 
 > Current state of things:
 > - run `remote` to serve, commands are not supported yet.
