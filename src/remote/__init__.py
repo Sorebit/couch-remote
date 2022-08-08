@@ -1,18 +1,17 @@
 import logging
 import pathlib
-from typing import Dict, List
 
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
 from pynput.keyboard import Key, Controller
 
 from remote import config
+from remote.models import KeyPress
 
 __version__ = '0.1.0'
 
-# global_config_path = '~/.config/pilot'
+# global_config_path = '~/.config/couch-remote'
 
 log = logging.getLogger(__name__)
 
@@ -88,13 +87,12 @@ templates = Jinja2Templates(directory=template_path)
 server = Server(config)
 
 
-class KeyPress(BaseModel):
-    key: str
+
 
 
 @app.post('/', response_model=KeyPress)
 async def tap(kp: KeyPress):
-    """On a successful attempt, returns pressed key."""
+    """On a successful attempt, responds with pressed key."""
     try:
         await server.tap(kp.key)
     except UnknownKeyError:

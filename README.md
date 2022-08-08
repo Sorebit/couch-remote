@@ -35,6 +35,6 @@ Q: Do jakiego formatu zapisują się i wczytują configi w settingsach?
 
 ### Install a global settings file `remote global settings.py `
 
-When ran, stores settings at a default path: `~/.config/pilot/settings.py`
+When ran, stores settings at a default path: `~/.config/couch-remote/settings.py`
 
 Pilot will default to this path when not specified.
