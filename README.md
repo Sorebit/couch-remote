@@ -10,7 +10,13 @@ A utility, available at [PyPI](https://pypi.org/project/couch-remote/). Download
 1. **To install:** `pip install couch-remote` (in a venv or globally)
 2. Now, your `remote` should be available.
 3. **Optionally,** `remote scaffold-config`, creates a basic settings file, then `remote global settings.py` copies it to a [global configuration directory](#install-a-global-settings-file-pilot-global-settingspy).
-4.  **Finally,** `remote control` serves an instance at [localhost:4444](http://localhost:4444). This is the **only** command, you're going to need from now on.
+4.  **Finally,** `remote control` serves an instance at [0.0.0.0:4444](http://localhost:4444). This is the **only** command, you're going to need from now on.
+
+## Supported Operating Systems
+- [x] Linux (Xorg) - by pynput
+- [ ] Linux (Wayland)
+- [x] Windows - by pynput
+- [ ] macos
 
 ## Settings
 
