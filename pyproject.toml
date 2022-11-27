@@ -37,7 +37,7 @@ requires-python = ">=3.8"
 dev = ["black", "bumpver", "isort", "pip-tools", "pytest"]
 
 [project.urls]
-Homepage = "https://github.com/sorebit/pilot"
+Homepage = "https://github.com/sorebit/couch-remote"
 
 [project.scripts]
 remote = "remote.__main__:main"
