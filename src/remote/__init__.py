@@ -9,7 +9,7 @@ from pynput.keyboard import Key, Controller
 from remote import config
 from remote.models import KeyPress
 
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 
 # global_config_path = '~/.config/couch-remote'
 
