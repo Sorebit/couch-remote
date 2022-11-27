@@ -15,4 +15,5 @@ buttons = {
     'space': Button(key=Key.space, label='Space'),
 }
 
+host = '0.0.0.0'
 port = 4444
