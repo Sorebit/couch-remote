@@ -3,11 +3,11 @@
 - Run `remote` to serve
     - Commands are not supported yet.
 - Supported Operating Systems:
-    - [x] Linux (Xorg) - by pynput
-    - [x] Windows - by pynput
+    - [x] Linux (Xorg) - pynput
+    - [x] Windows - pynput
+    - [x] macos - pynput (tested on 12.6)
 - Not yet supported Operating Systems:
     - [ ] Linux (Wayland)
-    - [ ] macos - requires testing
 
 ---
 
@@ -22,7 +22,7 @@ A utility, available at [PyPI](https://pypi.org/project/couch-remote/), which se
 3. **Optionally,** `remote scaffold-config`, creates a basic settings file, then `remote global settings.py` copies it to a [global configuration directory](#install-a-global-settings-file-remote-global-settingspy).
 4.  **Finally,** `remote control` serves an instance at [0.0.0.0:4444](http://localhost:4444). This is the **only** command, you're going to need from now on.
 
-
+> On macOS it might be required to allow the running process to control your keyboard. Most likely a pop-up will open on the first recorded keypress.
 
 ## Settings
 
